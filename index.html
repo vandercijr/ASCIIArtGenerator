@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div style="display: flex; flex-direction: column">
+      <div style="display: flex; flex-direction: row">
+        <div
+          id="asciiImageOutput"
+          style="display: block; text-align: center"
+        ></div>
+      </div>
+      <div style="display: flex; flex-direction: row">
+        <div
+          id="asciiVideoOutput"
+          style="display: block; text-align: center"
+        ></div>
+      </div>
+    </div>
+  </body>
+  <script src="image.js"></script>
+  <script src="art.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOM loaded");
+
+      const imageCanvas = document.createElement("canvas");
+      imageCanvas.setAttribute("width", "400");
+      imageCanvas.setAttribute("height", "400");
+
+      const asciiImageOutput = document.getElementById("asciiImageOutput");
+
+      const contextImage = imageCanvas.getContext("2d");
+
+      setupImage("cat32.jpg", (image) => {
+        renderAscii(image, asciiImageOutput, imageCanvas, true);
+      });
+    });
+  </script>
+</html>
