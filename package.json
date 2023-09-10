@@ -1,0 +1,25 @@
+{
+  "name": "asciiartgenerator",
+  "version": "1.0.0",
+  "description": "An ASCII Art Generator",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vandercijr/ASCIIArtGenerator.git"
+  },
+  "keywords": [
+    "ascii",
+    "art",
+    "generator"
+  ],
+  "author": "Vanderci Curvelo Junior",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vandercijr/ASCIIArtGenerator/issues"
+  },
+  "homepage": "https://github.com/vandercijr/ASCIIArtGenerator#readme"
+}
