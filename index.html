@@ -2,41 +2,187 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div style="display: flex; flex-direction: column">
-      <div style="display: flex; flex-direction: row">
+    <div class="column">
+      <div class="row" style="height: 5vh">
+        <div style="flex-basis: 50%; padding: 2px">
+          <h2 style="text-align: center">Image input</h2>
+        </div>
+        <div style="flex-basis: 50%; padding: 2px">
+          <h2 style="text-align: center">Image ASCII output</h2>
+        </div>
+      </div>
+      <div class="row" style="height: 45vh">
+        <div
+          id="imageCanvasContainer"
+          class="container file-selector"
+          style="flex-basis: 50%; flex-grow: 1; padding: 1rem"
+        >
+          <input
+            id="fileInput"
+            type="file"
+            accept="image/png,image/jpeg"
+            hidden
+          />
+        </div>
         <div
           id="asciiImageOutput"
-          style="display: block; text-align: center"
+          class="container"
+          style="flex-basis: 50%; flex-grow: 1; padding: 1rem"
         ></div>
       </div>
-      <div style="display: flex; flex-direction: row">
+      <div class="row" style="height: 5vh">
+        <div style="flex-basis: 50%">
+          <h2 style="text-align: center">Camera input</h2>
+        </div>
+        <div style="flex-basis: 50%">
+          <h2 style="text-align: center">Camera ASCII output</h2>
+        </div>
+      </div>
+
+      <div class="row" style="height: 45vh">
+        <div
+          id="videoContainer"
+          class="container"
+          style="flex-basis: 50%; height: 100%; text-align: center"
+        ></div>
         <div
           id="asciiVideoOutput"
-          style="display: block; text-align: center"
+          class="container"
+          style="flex-basis: 50%; height: 100%"
         ></div>
       </div>
     </div>
   </body>
   <script src="image.js"></script>
+  <script src="camera.js"></script>
   <script src="art.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       console.log("DOM loaded");
 
-      const imageCanvas = document.createElement("canvas");
-      imageCanvas.setAttribute("width", "400");
-      imageCanvas.setAttribute("height", "400");
+      const BYTE_SIZE_REF = 32;
 
-      const asciiImageOutput = document.getElementById("asciiImageOutput");
+      const imageCanvas = document.createElement("canvas");
+      imageCanvas.setAttribute("width", "100%");
+      imageCanvas.setAttribute("height", "100%");
 
       const contextImage = imageCanvas.getContext("2d");
 
-      setupImage("cat32.jpg", (image) => {
-        renderAscii(image, asciiImageOutput, imageCanvas, true);
+      const asciiImageOutput = document.getElementById("asciiImageOutput");
+
+      const fileInput = document.getElementById("fileInput");
+
+      const imageCanvasContainer = document.getElementById(
+        "imageCanvasContainer"
+      );
+
+      imageCanvasContainer.addEventListener("click", () => {
+        fileInput.click();
       });
+
+      const loadImage = (img) => {
+        createImage(img, (image) => {
+          const images = document.querySelectorAll("img");
+          images.forEach((i) => {
+            i.parentNode.removeChild(i);
+          });
+
+          imageCanvasContainer.append(image);
+          image.setAttribute("width", "auto");
+          image.setAttribute("height", "100%");
+
+          const imageScale =
+            BYTE_SIZE_REF /
+            (image.width / image.height > 0 ? image.height : image.width);
+
+          const resizeWidth = Math.floor(imageScale * image.width);
+          const resizeHeight = Math.floor(imageScale * image.height);
+
+          contextImage.drawImage(image, 0, 0, resizeWidth, resizeHeight);
+
+          imageCanvas.toBlob((data) => {
+            createImage(URL.createObjectURL(data), (resizedImage) => {
+              resizedImage.setAttribute("width", resizeWidth);
+              resizedImage.setAttribute("height", resizeHeight);
+              renderAscii(resizedImage, asciiImageOutput);
+            });
+          }, "image/jpg");
+        });
+      };
+
+      fileInput.addEventListener("change", (e) => {
+        const files = Array.from(event.target.files);
+        const [file] = files;
+
+        if (file) {
+          if (!fileInput.accept.includes(file.type)) {
+            if (typeof onError === "function") {
+              console.log("Arquivo inválido");
+            }
+          } else {
+            const selectedImage = new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.addEventListener(
+                "load",
+                () => resolve(reader.result),
+                false
+              );
+              reader.readAsDataURL(file);
+            });
+
+            selectedImage.then((img) => loadImage(img));
+          }
+        }
+      });
+
+      loadImage("default.png");
+
+      const video = document.createElement("video");
+
+      const videoPreviewCanvas = document.createElement("canvas");
+      const contextVideo = videoPreviewCanvas.getContext("2d", {
+        willReadFrequently: true,
+      });
+
+      const { offsetWidth: width, offsetHeight: height } = videoContainer;
+      const videoScale = BYTE_SIZE_REF / (width / height > 0 ? height : width);
+
+      const asciiVideoOutput = document.getElementById("asciiVideoOutput");
+
+      const interval = 1000;
+      const fps = 30;
+
+      videoContainer.append(videoPreviewCanvas);
+
+      createCamera(
+        {
+          videoEl: video,
+          width: width * videoScale,
+          height: height * videoScale,
+          interval: interval / fps,
+        },
+        (video) => {
+          const residedWidth = width * 0.3;
+          const residedHeight = height * 0.3;
+          contextVideo.drawImage(
+            video,
+            0,
+            0,
+            width * videoScale,
+            height * videoScale,
+            Math.floor((videoPreviewCanvas.width - residedWidth) / 2),
+            Math.floor((videoPreviewCanvas.height - residedHeight) / 2),
+            residedWidth,
+            residedHeight
+          );
+
+          renderAscii(video, asciiVideoOutput);
+        }
+      );
     });
   </script>
 </html>
