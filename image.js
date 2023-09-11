@@ -1,4 +1,4 @@
-const setupImage = (imageSource, callback) => {
+const createImage = (imageSource, callback) => {
   const image = new Image();
   image.src = imageSource;
 
