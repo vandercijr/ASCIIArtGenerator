@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/vandercijr/ASCIIArtGenerator/issues"
   },
-  "homepage": "https://github.com/vandercijr/ASCIIArtGenerator#readme"
+  "homepage": "https://github.com/vandercijr/ASCIIArtGenerator#readme",
+  "devDependencies": {
+    "gh-pages": "^5.0.0"
+  }
 }

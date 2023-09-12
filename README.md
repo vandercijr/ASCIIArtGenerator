@@ -10,4 +10,8 @@ This is a passtime project which outputs an ASCII art from a video or an image i
 
 `npm start`
 
+To check it out
+
+[https://vandercijr.github.io/ASCIIArtGenerator/](https://vandercijr.github.io/ASCIIArtGenerator/)
+
 Any contribution, be my guest
